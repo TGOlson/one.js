@@ -8,18 +8,61 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 
 ## Usage
 
-* Create an `index.html` file, importing `jQuery`, `one.js` and any other JavaScript files.
+* Create an `index.html` file, importing `jQuery`, `one.js` and any other JavaScript files. Note: `jQuery` needs to be loaded before `one.js` can run.
 * Write your entire client side application in JavaScript:
+
+## HTML as JavaScript
+
+Write HTML using JavaScript object format.
 
 ```js
 One.initDOM({
   h1: 'Hi there',
+  p: 'Some sub-text',
+  div: {
+    h3: 'Headline in a div',
+    p: 'Text in a div',
+    div: {
+      p: [
+        'Nested text in a div',
+        'Another paragraph in the same div'
+      ]
+    }
+  },
   ul: {
-    li: 'item one',
-    li: 'item two'
+    li: ['item one', 'item two']
   }
 });
+```
 
+Gets translated to HTML
+
+```html
+<body>
+  <h1>Hi there</h1>
+  <p>Some sub-text</p>
+  <div>
+    <h3>Headline in a div</h3>
+    <p>Text in a div</p>
+    <div>
+      <p>Nested text in a div</p>
+      <p>Another paragraph in the same div</p>
+    </div>
+  </div>
+  <ul>
+    <li>item one</li>
+    <li>item two</li>
+  </ul>
+</body>
+```
+
+Note: currently there is no way to define classes or ids. Also, duplicate elements on the save level have to be defined as arrays to avoid duplicate keys.
+
+## CSS as JavaScript
+
+Not yet implemented - possible syntax
+
+```js
 One.style({
   h1: {
     color: 'red',
