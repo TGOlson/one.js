@@ -9,7 +9,7 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 ## Usage
 
 * Create an `index.html` file, importing `jQuery`, `one.js` and any other JavaScript files. Note: `jQuery` needs to be loaded before `one.js` can run.
-* Write your entire client side application in JavaScript:
+* Write an entire client side application in JavaScript.
 
 ## HTML as JavaScript
 
@@ -71,5 +71,48 @@ One.style({
   li: {
     list-style: none;
   }
+});
+```
+
+## TODO
+* Add classes an ids to elements
+```js
+{
+  'h1.class-name#some-id': 'Way cool text'
+};
+
+// or using attributes
+
+{
+  h1: {
+    class: 'class-name',
+    id: 'some-id',
+    content: 'Way cool text'
+  }
+};
+```
+* Allow defining attributes on elements (data, style, src, etc.)
+```js
+{
+  img: {
+    src: 'http://someimg.com/img.jpg',
+    style: {
+      border: '1px solid blue',
+      margin: '5px'
+    }
+  }
+};
+```
+* Display templated syntax for defining elements
+```js
+
+var header = {
+  h1: 'Cool site',
+  ul: {...}
+};
+
+One.initDOM({
+  template: header,
+  div: {...}
 });
 ```
