@@ -211,7 +211,11 @@ function _evaluateStyleObject(selector, styles) {
 var Style = function(selector, styles) {
   this.selector = selector;
   this.styles = styles;
-  this.css = this.toString();
+
+  // is this necessary?
+  // to string should probably only be generated on demand to avoid stale strings
+  // or add an update method
+  // this.css = this.toString();
 
   Style._styles.push(this);
 };
@@ -228,6 +232,10 @@ Style.compile = function() {
 
 Style.prototype.toString = function() {
   return _evaluateStyleObject(this.selector, this.styles);
+};
+
+Style.prototype.update = function(styles) {
+  // todo
 };
 
 CSS.Style = Style;

@@ -131,11 +131,27 @@ var style = new Style('p', {color: 'purple'});
 
 CSS.compile();
 ```
-
 The current stylesheet will now include the defined style `p {color: purple;}`.
+
+* Edit previous styles
+
+```js
+// style variable from previous example
+// => `p {color: purple;}`
+
+style.styles.color = 'green';
+
+CSS.compile();
+```
+
+Now the style is updated `p {color: green;}`.
+
+*note*, later this will use an `update` method.
+
 
 ## TODO
 * Add section about avoiding duplicate element keys
+* Add option to auto-comile on style created/update
 * Consider breaking HTML and CSS into `one/html` and `one/css` submodules.
 * Add attribute class and id declaration to elements
 ```js
