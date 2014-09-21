@@ -16,12 +16,13 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 Write HTML using JavaScript object format.
 
 ```js
-One.initDOM({
-  h1: 'Hi there',
-  p: 'Some sub-text',
+var HTML = One.HTML;
+
+HTML.init({
+  'h1.header.large': 'Hi there',
+  'p#custom-subtext': 'Some sub-text',
   div: {
     h3: 'Headline in a div',
-    p: 'Text in a div',
     div: {
       p: [
         'Nested text in a div',
@@ -30,7 +31,7 @@ One.initDOM({
     }
   },
   ul: {
-    li: ['item one', 'item two']
+    'li.styled-item': ['item one', 'item two']
   }
 });
 ```
@@ -39,19 +40,18 @@ Gets translated to HTML
 
 ```html
 <body>
-  <h1>Hi there</h1>
-  <p>Some sub-text</p>
+  <h1 class="header large">Hi there</h1>
+  <p id="custom-subtext">Some sub-text</p>
   <div>
     <h3>Headline in a div</h3>
-    <p>Text in a div</p>
     <div>
       <p>Nested text in a div</p>
       <p>Another paragraph in the same div</p>
     </div>
   </div>
   <ul>
-    <li>item one</li>
-    <li>item two</li>
+    <li class="styled-item">item one</li>
+    <li class="styled-item">item two</li>
   </ul>
 </body>
 ```
@@ -60,29 +60,53 @@ Note: currently there is no way to define classes or ids. Also, duplicate elemen
 
 ## CSS as JavaScript
 
-Not yet implemented - possible syntax
-
 ```js
-One.style({
+var CSS = One.CSS;
+
+CSS.init({
   h1: {
     color: 'red',
-    padding: '5px'
+    padding: '5px',
+    border: '1px solid black'
+  },
+  '.header': {
+    'font-size': '20px'
+  },
+  '#custom-subtext': {
+    'text-decoration': 'underline'
   },
   li: {
-    list-style: none;
+    'list-style': 'none',
+    'background-color': 'green'
   }
 });
 ```
 
+```css
+h1 {
+  color: red;
+  padding: 5px;
+  border: 1px solid black;
+}
+
+.header {
+  font-size: 20px;
+}
+
+#custom-subtext {
+  text-decoration: underline;
+}
+
+li {
+  list-style: none;
+  background-color: green;
+}
+
+```
+
 ## TODO
-* Add classes an ids to elements
+* Add attribute class and id declaration to elements
 ```js
-{
-  'h1.class-name#some-id': 'Way cool text'
-};
-
-// or using attributes
-
 {
   h1: {
     class: 'class-name',
@@ -103,7 +127,7 @@ One.style({
   }
 };
 ```
-* Display templated syntax for defining elements
+* Create template syntax for defining elements
 ```js
 
 var header = {

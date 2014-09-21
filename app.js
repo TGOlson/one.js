@@ -19,14 +19,15 @@ HTML.init({
     }
   },
   ul: {
-    'li.styled-items': ['item one', 'item two']
+    'li.styled-item': ['item one', 'item two']
   }
 });
 
 CSS.init({
   h1: {
     color: 'red',
-    padding: '5px'
+    padding: '5px',
+    border: '1px solid black'
   },
   '.header': {
     'font-size': '20px'
@@ -36,6 +37,7 @@ CSS.init({
   },
   li: {
     'list-style': 'none',
+    'background-color': 'green'
   }
 });
 

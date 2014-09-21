@@ -140,13 +140,43 @@ function append(parent, element) {
  */
 
 // currently does not accept nested styles
-// write in standard css style
+// write in standard css format
 CSS.init = function(styleObject) {
-  $.map(styleObject, evaluateStyleDeclaration);
+  var formattedStyles = evaluateStyleObject(styleObject),
+    style = $('<style>')
+      .attr({type: 'text/css'})
+      .text(formattedStyles);
+
+  $('head').append(style);
 };
 
-function evaluateStyleDeclaration(value, element) {
-  $(element).css(value);
+function evaluateStyleObject(styleObject) {
+  var formattedStyles = $.map(styleObject, function(value, element) {
+    var styleString = element + JSON.stringify(value);
+
+    // ** format string to standard css formatting with spaces and newlines
+
+    // add space before opening bracket, followed by newline
+    styleString = styleString.replace(/{/g, ' {\n')
+
+      // remove all double quotes created from stringifying
+      .replace(/"/g, '')
+
+      // convert commas to semicolons
+      .replace(/,/g, ';\n')
+
+      // add extra space after each colon
+      .replace(/:/g, ': ')
+
+      // add closing semicolon and new line before closing brackets
+      // add new line after bracket
+      .replace(/}/g, ';\n}\n');
+
+    console.log(styleString);
+    return styleString;
+  });
+
+  return formattedStyles.join(' ');
 }
 
 // attach sub-modules
