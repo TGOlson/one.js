@@ -1,20 +1,27 @@
 (function(definition) {
 
-  // globally define One
-  One = definition();
+  // require/node
+  if(typeof exports === 'object') {
+    module.exports = definition();
+
+  } else {
+    // globally define One
+    One = definition();
+  }
+
 
 })(function() {
 "use strict";
 
-    // main module
-var One  = {},
 
-    // html sub-module
-    HTML = {},
+var One  = {}, // main module
+    HTML = {}, // html sub-module
+    CSS  = {}; // css sub-module
 
-    // css sub-module
-    CSS  = {};
 
+/*
+ * Public HTML Api
+ */
 
 HTML.init = function(domObject) {
   var elements = $.map(domObject, evaluateElementObject),
@@ -22,6 +29,30 @@ HTML.init = function(domObject) {
 
   append(body, elements);
 };
+
+
+/*
+ * Private HTML Api
+ */
+
+
+HTML._parseClassesFromElementDeclaration = function(elementName) {
+  var match = elementName.match(/[.](\w+)(-?)(\w+)/g),
+    klasses;
+
+  if(match) {
+    klasses = match.map(function(klass) {
+      return klass.replace('.', '');
+    });
+  }
+
+  return klasses;
+};
+
+
+/*
+ * Helpers
+ */
 
 function evaluateElementObject(value, elementName) {
   var element;
@@ -45,22 +76,6 @@ function evaluateElementObject(value, elementName) {
 function createElement(elementName) {
   return $('<' + elementName + '>');
 }
-
-function getClass(elementName) {
-  var match = elementName.match(/[.](\w+)(-?)(\w+)/g),
-    klass;
-
-  if(match) {
-
-    // take second element of match, which does not include preceding '.'
-    klass = match; // [1].split('.');
-  }
-
-  return klass;
-}
-
-window.getClass = getClass;
-window.getId = getId;
 
 // only match 1 id per element
 function getId(elementName) {
