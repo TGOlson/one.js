@@ -13,7 +13,7 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 
 ## HTML as JavaScript
 
-Write HTML using JavaScript object format.
+Write markup in JavaScript object format.
 
 ```js
 var HTML = One.HTML;
@@ -36,7 +36,7 @@ HTML.init({
 });
 ```
 
-Gets translated to HTML
+Gets directly compiled to HTML
 
 ```html
 <body>
@@ -56,17 +56,19 @@ Gets translated to HTML
 </body>
 ```
 
-Note: to avoid duplicate keys, use array syntax, templates, or use the name modifier `()`. Anything inside of the parenthesis will be removed.
+Note: to avoid duplicate keys, use array syntax, templates, or use the name modifier `(...)`. Anything inside of the parenthesis will be removed, and provides a strategy for avoiding duplicate keys
 
 ```js
 var section = {
   'p(1)': 'some text',
   'p(2)': 'more text',
-  'p(3)': 'evan more'
+  'p(3)': 'even more'
 };
 ```
 
 ## CSS as JavaScript
+
+Write styles in JavaScript
 
 ```js
 var CSS = One.CSS;
@@ -89,6 +91,8 @@ CSS.init({
   }
 });
 ```
+
+Gets compiled directly to CSS
 
 ```css
 h1 {
