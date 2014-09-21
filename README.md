@@ -139,15 +139,12 @@ The current stylesheet will now include the defined style `p {color: purple;}`.
 // style variable from previous example
 // => `p {color: purple;}`
 
-style.styles.color = 'green';
+style.update({color: 'green'});
 
 CSS.compile();
 ```
 
 Now the style is updated `p {color: green;}`.
-
-*note*, later this will use an `update` method.
-
 
 ## TODO
 * Add section about avoiding duplicate element keys

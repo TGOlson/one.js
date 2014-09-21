@@ -13,14 +13,12 @@
 })(function() {
 "use strict";
 
-var One  = {}, // main module
-    HTML = {}, // html sub-module
-    CSS  = {}; // css sub-module
+
+function One() {}
 
 
-/*
- * Public HTML Api
- */
+One.HTML = HTML;
+function HTML() {}
 
 HTML.init = function(domObject) {
   var elements = $.map(domObject, evaluateElementDeclaration),
@@ -141,10 +139,15 @@ function append(parent, element) {
 
 // currently does not accept nested styles
 // write in standard css format
+One.CSS = CSS;
+function CSS() {}
+
 CSS.init = function(styleDeclaration) {
 
   // create style objects
-  createStyles(styleDeclaration);
+  $.map(styleDeclaration, function(styles, selector) {
+    var style = new Style(selector, styles);
+  });
 
   // compile css from all current style objects
   this.compile();
@@ -180,16 +183,39 @@ CSS._createStyleElement = function(id) {
     });
 };
 
-function createStyles(styleDeclaration) {
-  var formattedStyles = $.map(styleDeclaration, function(styles, selector) {
-    var style = new Style(selector, styles);
-  });
+
+CSS.Style = Style;
+function Style(selector, styles) {
+  this.selector = selector;
+  this.styles = styles;
+
+  // is this necessary?
+  // to string should probably only be generated on demand to avoid stale strings
+  // or add an update method
+  // this.css = this.toString();
+
+  Style._styles[selector] = this;
 }
 
-function _evaluateStyleObject(selector, styles) {
-  var styleString = selector + JSON.stringify(styles);
+Style._styles = {};
 
-  // ** format string to standard css formatting with spaces and newlines
+Style.compile = function() {
+  var styles = this._styles;
+
+  return $.map(styles, function(style, selector) {
+    return style.toString();
+  }).join('\n');
+};
+
+Style.get = get;
+function get(selector) {
+  return Style._styles[selector];
+}
+
+// ** format string to standard css formatting with spaces and newlines
+Style.prototype.toString = function() {
+  var styleString = this.selector + JSON.stringify(this.styles);
+
 
   // add space before opening bracket, followed by newline
   return styleString.replace(/{/g, ' {\n  ')
@@ -206,44 +232,16 @@ function _evaluateStyleObject(selector, styles) {
     // add closing semicolon and new line before closing brackets
     // add new line after bracket
     .replace(/}/g, ';\n}');
-}
-
-var Style = function(selector, styles) {
-  this.selector = selector;
-  this.styles = styles;
-
-  // is this necessary?
-  // to string should probably only be generated on demand to avoid stale strings
-  // or add an update method
-  // this.css = this.toString();
-
-  Style._styles.push(this);
-};
-
-Style._styles = [];
-
-Style.compile = function() {
-  var styles = this._styles;
-
-  return $.map(styles, function(style) {
-    return style.toString();
-  }).join('\n');
-};
-
-Style.prototype.toString = function() {
-  return _evaluateStyleObject(this.selector, this.styles);
 };
 
 Style.prototype.update = function(styles) {
-  // todo
+  var _this = this;
+  $.each(styles, function(val, style) {
+    _this.styles[val] = style;
+  });
+
+  return this;
 };
 
-CSS.Style = Style;
-
-// attach sub-modules
-One.HTML = HTML;
-One.CSS = CSS;
-
 return One;
-
 });
