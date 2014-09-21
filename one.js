@@ -13,7 +13,6 @@
 })(function() {
 "use strict";
 
-
 var One  = {}, // main module
     HTML = {}, // html sub-module
     CSS  = {}; // css sub-module
@@ -24,7 +23,7 @@ var One  = {}, // main module
  */
 
 HTML.init = function(domObject) {
-  var elements = $.map(domObject, evaluateElementObject),
+  var elements = $.map(domObject, evaluateElementDeclaration),
     body = $('body');
 
   append(body, elements);
@@ -35,18 +34,59 @@ HTML.init = function(domObject) {
  * Private HTML Api
  */
 
+// returns a space-separated string of all class present in element declaration
+// undefined if no classes are present
+HTML._parseElementTypeFromElementDeclaration = function(elementDeclaration) {
+  var match = elementDeclaration.match(/^\w+-*\w*/);
 
-HTML._parseClassesFromElementDeclaration = function(elementName) {
-  var match = elementName.match(/[.](\w+)(-?)(\w+)/g),
-    klasses;
+  if(!match) {
+    throw new Error('No element type in element declaration.');
+  }
+
+  return match.pop();
+};
+
+// returns a space-separated string of all class present in element declaration
+// undefined if no classes are present
+HTML._parseClassesFromElementDeclaration = function(elementDeclaration) {
+  var match = elementDeclaration.match(/[.](\w+)(-?)(\w+)/g),
+    klasses = null;
 
   if(match) {
     klasses = match.map(function(klass) {
       return klass.replace('.', '');
-    });
+    }).join(' ');
   }
 
   return klasses;
+};
+
+// returns a string id if present in element declaration
+// undefined if no id is present
+// throw error if more than one id declared
+HTML._parseIdFromElementDeclaration = function(elementDeclaration) {
+  var match = elementDeclaration.match(/[#](\w+)(-?)(\w+)/g),
+    id = null;
+
+  if(match) {
+    if(match.length > 1) throw new Error('Multiple ids in element declaration.');
+
+    id = match.pop().replace('#', '');
+  }
+
+  return id;
+};
+
+HTML._convertElementDeclartionToObject = function(elementDeclaration) {
+  var type = this._parseElementTypeFromElementDeclaration(elementDeclaration),
+    klass = this._parseClassesFromElementDeclaration(elementDeclaration),
+    id = this._parseIdFromElementDeclaration(elementDeclaration);
+
+  return {
+    type: type,
+    class: klass,
+    id: id
+  };
 };
 
 
@@ -54,47 +94,38 @@ HTML._parseClassesFromElementDeclaration = function(elementName) {
  * Helpers
  */
 
-function evaluateElementObject(value, elementName) {
+function evaluateElementDeclaration(value, elementDeclaration) {
   var element;
 
   if(typeof value === 'string') {
-    element = createElementWithText(elementName, value);
+    element = createElementWithText(elementDeclaration, value);
   }
 
   if(Array.isArray(value)) {
     element = $.map(value, function(value) {
-      return evaluateElementObject(value, elementName);
+      return evaluateElementDeclaration(value, elementDeclaration);
     });
   } else if(typeof value === 'object') {
-    var elements = $.map(value, evaluateElementObject);
-    element = createElement(elementName).append(elements);
+    var elements = $.map(value, evaluateElementDeclaration);
+    element = createElement(elementDeclaration).append(elements);
   }
 
   return element;
 }
 
-function createElement(elementName) {
-  return $('<' + elementName + '>');
+function createElement(elementDeclaration) {
+  var elementObject = HTML._convertElementDeclartionToObject(elementDeclaration),
+    type = elementObject.type,
+    klass = elementObject.class,
+    id = elementObject.id;
+
+  return $('<' + type + '>')
+    .addClass(klass)
+    .attr({id: id});
 }
 
-// only match 1 id per element
-function getId(elementName) {
-  // http://stackoverflow.com/questions/192048/can-an-html-element-have-multiple-ids
-  var match = elementName.match(/[#](\S+)(?=(.|$))/),
-    id;
-
-  if(match) {
-
-    // take second element of match, which does not include preceding '.'
-    id = match[1].split('.');
-  }
-
-  return id;
-}
-
-
-function createElementWithText(elementName, text) {
-  var element = createElement(elementName)
+function createElementWithText(elementDeclaration, text) {
+  var element = createElement(elementDeclaration)
     .text(text);
 
   return element;
@@ -102,6 +133,20 @@ function createElementWithText(elementName, text) {
 
 function append(parent, element) {
   parent.append(element);
+}
+
+/*
+ * Public CSS Api
+ */
+
+// currently does not accept nested styles
+// write in standard css style
+CSS.init = function(styleObject) {
+  $.map(styleObject, evaluateStyleDeclaration);
+};
+
+function evaluateStyleDeclaration(value, element) {
+  $(element).css(value);
 }
 
 // attach sub-modules

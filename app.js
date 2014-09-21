@@ -3,12 +3,14 @@
 
 $(function() {
 
-One.HTML.init({
-  h1: 'Hi there',
-  p: 'Some sub-text',
+var HTML = One.HTML,
+  CSS = One.CSS;
+
+HTML.init({
+  'h1.header.large': 'Hi there',
+  'p#custom-subtext': 'Some sub-text',
   div: {
     h3: 'Headline in a div',
-    p: 'Text in a div',
     div: {
       p: [
         'Nested text in a div',
@@ -17,19 +19,25 @@ One.HTML.init({
     }
   },
   ul: {
-    li: ['item one', 'item two']
+    'li.styled-items': ['item one', 'item two']
   }
 });
 
-// One.style({
-//   h1: {
-//     color: 'red',
-//     padding: '5px'
-//   },
-//   li: {
-//     list-style: none;
-//   }
-// });
+CSS.init({
+  h1: {
+    color: 'red',
+    padding: '5px'
+  },
+  '.header': {
+    'font-size': '20px'
+  },
+  '#custom-subtext': {
+    'text-decoration': 'underline'
+  },
+  li: {
+    'list-style': 'none',
+  }
+});
 
 
 });
