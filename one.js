@@ -141,43 +141,96 @@ function append(parent, element) {
 
 // currently does not accept nested styles
 // write in standard css format
-CSS.init = function(styleObject) {
-  var formattedStyles = evaluateStyleObject(styleObject),
-    style = $('<style>')
-      .attr({type: 'text/css'})
-      .text(formattedStyles);
+CSS.init = function(styleDeclaration) {
 
-  $('head').append(style);
+  // create style objects
+  createStyles(styleDeclaration);
+
+  // compile css from all current style objects
+  this.compile();
 };
 
-function evaluateStyleObject(styleObject) {
-  var formattedStyles = $.map(styleObject, function(value, element) {
-    var styleString = element + JSON.stringify(value);
+CSS._defaultId = 'stylesheet';
 
-    // ** format string to standard css formatting with spaces and newlines
+// compile all current style objects to css format
+// optionally accepts an id for target style-sheet
+CSS.compile = function(id) {
+  id = id || this._defaultId;
 
-    // add space before opening bracket, followed by newline
-    styleString = styleString.replace(/{/g, ' {\n')
+  var styleElement = $('#' + id),
+    styles = Style.compile();
 
-      // remove all double quotes created from stringifying
-      .replace(/"/g, '')
+  if(!styleElement.length) {
+    styleElement = this._createStyleElement(id);
+  }
 
-      // convert commas to semicolons
-      .replace(/,/g, ';\n')
+  styleElement.text(styles);
 
-      // add extra space after each colon
-      .replace(/:/g, ': ')
+  $('head').append(styleElement);
+};
 
-      // add closing semicolon and new line before closing brackets
-      // add new line after bracket
-      .replace(/}/g, ';\n}\n');
 
-    console.log(styleString);
-    return styleString;
+CSS._createStyleElement = function(id) {
+  id = id || this._defaultId;
+
+  return $('<style>')
+    .attr({
+      type: 'text/css',
+      id: id
+    });
+};
+
+function createStyles(styleDeclaration) {
+  var formattedStyles = $.map(styleDeclaration, function(styles, selector) {
+    var style = new Style(selector, styles);
   });
-
-  return formattedStyles.join(' ');
 }
+
+function _evaluateStyleObject(selector, styles) {
+  var styleString = selector + JSON.stringify(styles);
+
+  // ** format string to standard css formatting with spaces and newlines
+
+  // add space before opening bracket, followed by newline
+  return styleString.replace(/{/g, ' {\n  ')
+
+    // remove all double quotes created from stringifying
+    .replace(/"/g, '')
+
+    // convert commas to semicolons, adding extra space
+    .replace(/,/g, ';\n  ')
+
+    // add extra space after each colon
+    .replace(/:/g, ': ')
+
+    // add closing semicolon and new line before closing brackets
+    // add new line after bracket
+    .replace(/}/g, ';\n}');
+}
+
+var Style = function(selector, styles) {
+  this.selector = selector;
+  this.styles = styles;
+  this.css = this.toString();
+
+  Style._styles.push(this);
+};
+
+Style._styles = [];
+
+Style.compile = function() {
+  var styles = this._styles;
+
+  return $.map(styles, function(style) {
+    return style.toString();
+  }).join('\n');
+};
+
+Style.prototype.toString = function() {
+  return _evaluateStyleObject(this.selector, this.styles);
+};
+
+CSS.Style = Style;
 
 // attach sub-modules
 One.HTML = HTML;

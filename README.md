@@ -1,8 +1,14 @@
 # one.js
 
-## Framework for single language client side applications.
-
 Write HTML in JavaScript. Write CSS in JavaScript. Write JavaScript in JavaScript.
+
+Framework for single language client side applications.
+
+## About
+
+`one.js` allows developers to write entire client side applications using only one language - JavaScript. This helps reduce cognitive overhead, and produces a much more programmatic way of writing style and markup.
+
+Do wild things like passing style objects around, modifying them dynamically. Or creating markup templates in a concise, explicit manner.
 
 Lots of inspiration taken from [React](http://facebook.github.io/react/), as well many of the excellent templating libraries and JavaScript frameworks.
 
@@ -113,11 +119,24 @@ li {
   list-style: none;
   background-color: green;
 }
-
 ```
+
+* Programmatically add styles
+
+```js
+var CSS = One.CSS,
+  Style = CSS.Style;
+
+var style = new Style('p', {color: 'purple'});
+
+CSS.compile();
+```
+
+The current stylesheet will now include the defined style `p {color: purple;}`.
 
 ## TODO
 * Add section about avoiding duplicate element keys
+* Consider breaking HTML and CSS into `one/html` and `one/css` submodules.
 * Add attribute class and id declaration to elements
 ```js
 {
