@@ -56,7 +56,15 @@ Gets translated to HTML
 </body>
 ```
 
-Note: currently there is no way to define classes or ids. Also, duplicate elements on the save level have to be defined as arrays to avoid duplicate keys.
+Note: to avoid duplicate keys, use array syntax, templates, or use the name modifier `()`. Anything inside of the parenthesis will be removed.
+
+```js
+var section = {
+  'p(1)': 'some text',
+  'p(2)': 'more text',
+  'p(3)': 'evan more'
+};
+```
 
 ## CSS as JavaScript
 
@@ -105,6 +113,7 @@ li {
 ```
 
 ## TODO
+* Add section about avoiding duplicate element keys
 * Add attribute class and id declaration to elements
 ```js
 {
