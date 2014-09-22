@@ -182,9 +182,8 @@ function StyleSheet(id) {
 StyleSheet.prototype.defineStyles = function(styleObject) {
   var _this = this;
 
-  $.map(styleObject, function(styles, selector) {
-    var style = new Style(selector, styles);
-    _this.addStyle(style);
+  $.map(styleObject, function(definitions, selector) {
+    _this.addStyle(selector, definitions);
   });
 
   // add option to enable/disable auto-compilation
@@ -196,10 +195,16 @@ StyleSheet.prototype.getStyle = function(selector) {
 };
 
 // assumes style is a style object
-StyleSheet.prototype.addStyle = function(style) {
+StyleSheet.prototype.addStyle = function(selector, definitions) {
+  var style = new Style(selector, definitions);
+
   this.styles[style.selector] = style;
+
   style.styleSheet = this;
-  return this.compileIfAutoCompile();
+
+  this.compileIfAutoCompile();
+
+  return style;
 };
 
 StyleSheet.prototype.updateStyle = function(selector, styles) {
@@ -209,7 +214,9 @@ StyleSheet.prototype.updateStyle = function(selector, styles) {
 
   style.update(styles);
 
-  return this.compileIfAutoCompile();
+  this.compileIfAutoCompile();
+
+  return style;
 };
 
 // currently assumes selector is a string
@@ -221,12 +228,13 @@ StyleSheet.prototype.removeStyle = function(selector) {
 
   delete this.styles[selector];
 
-  return this.compileIfAutoCompile();
+  this.compileIfAutoCompile();
+
+  return style;
 };
 
 StyleSheet.prototype.compileIfAutoCompile = function() {
   if(this.autoCompile) this.compile();
-  return this;
 };
 
 StyleSheet.prototype.compile = function(stripWhiteSpace) {
@@ -245,15 +253,15 @@ StyleSheet.prototype.toCSS = function(stripWhiteSpace) {
 };
 
 CSS.Style = Style;
-function Style(selector, style) {
+function Style(selector, definitions) {
   this.selector = selector;
-  this.style = style;
+  this.definitions = definitions;
 }
 
 // ** format string to standard css formatting with spaces and newlines
 // add option to not add spaces and newlines
 Style.prototype.toCSS = function(stripWhiteSpace) {
-  var styleString = this.selector + JSON.stringify(this.style),
+  var styleString = this.selector + JSON.stringify(this.definitions),
 
     // set conditional delimiters
     space = stripWhiteSpace ? '' : ' ',
@@ -276,11 +284,11 @@ Style.prototype.toCSS = function(stripWhiteSpace) {
     .replace(/}/g, ';' + newline + '}');
 };
 
-Style.prototype.update = function(styles) {
+Style.prototype.update = function(definitions) {
   var _this = this;
 
-  $.each(styles, function(selector, style) {
-    _this.style[selector] = style;
+  $.each(definitions, function(property, value) {
+    _this.definitions[property] = value;
   });
 
   // check for auto compile if current style has a parent style-sheet
@@ -290,7 +298,20 @@ Style.prototype.update = function(styles) {
 };
 
 Style.prototype.getValue = function(property) {
-  return this.style[property];
+  return this.definitions[property];
+};
+
+Style.prototype.removeValue = function(property) {
+  var value = this.getValue(property);
+
+  if(!value) throw new Error('Cannot remove value.');
+
+  delete this.definitions[property];
+
+  // check for auto compile if current style has a parent style-sheet
+  if(this.styleSheet) this.styleSheet.compileIfAutoCompile();
+
+  return this;
 };
 
 return One;

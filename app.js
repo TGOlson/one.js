@@ -47,7 +47,7 @@ var style = styleSheet.getStyle('li');
 
 style.update({color: 'white', 'background-color': '#ccc'});
 
-var anotherStyle = new CSS.Style('p', {color: 'green'});
+styleSheet.addStyle('p', {color: 'green'});
 
-styleSheet.addStyle(anotherStyle);
+// styleSheet.addStyle(anotherStyle);
 });

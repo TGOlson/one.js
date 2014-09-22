@@ -126,33 +126,54 @@ li {
 
 ```js
 var CSS = One.CSS,
-  Style = CSS.Style;
-
-var style = new Style('p', {color: 'purple'}),
   styleSheet = CSS.getStyleSheet('main');
 
-styleSheet.addStyle(style);
+styleSheet.addStyle('p', {color: 'purple'});
 ```
 
-The current stylesheet will now include the defined style `p {color: purple;}`.
+The current style-sheet will now include the defined style `p {color: purple;}`.
 
 * Edit previous styles
 
 ```js
-// style variable from previous example
-// => `p {color: purple;}`
-
-style.update({color: 'green'});
+// styleSheet variable from previous example
+styleSheet.update('p', {color: 'green'});
 ```
 
 Now the style is updated `p {color: green;}`.
+
+* Interact with style objects
+
+```js
+var CSS = One.CSS,
+  styleSheet = CSS.getStyleSheet('main'),
+  style = styleSheet.getStyle('p');
+
+style.toCSS();
+// =>
+// "p {
+//   color: green;
+// }"
+
+style.update({'background-color:' 'yellow'});
+
+style.toCSS();
+// =>
+// "p {
+//   color: green;
+//   background-color: yellow;
+// }"
+
+style.getValue('color');
+// => 'green'
+```
 
 * Auto-compilation
 
 The above examples work by leveraging auto compilation. However, if this is undesirable, it can be toggled off in one of two ways:
 
 ```js
-// set default auto-compilation for stylesheets
+// set default auto-compilation for style-sheets
 // note: this must be set before any style-sheets are created
 // any style-sheet created before updating this property will not be affected
 One.CSS.autoCompile = false;
