@@ -19,7 +19,7 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 
 ## HTML as JavaScript
 
-**note, HTML development is currently on hold**
+*note, HTML development is currently on hold*
 
 Write markup in JavaScript object format.
 
@@ -81,7 +81,7 @@ Write styles in JavaScript
 ```js
 var CSS = One.CSS,
 
-  // style definition object
+  // style declaration object
   styles{
     h1: {
       color: 'red',
@@ -100,6 +100,7 @@ var CSS = One.CSS,
     }
   },
 
+  // must create style-sheet with id
   styleSheet = new CSS.StyleSheet('main', styles);
 ```
 
