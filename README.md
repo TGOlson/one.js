@@ -77,9 +77,10 @@ var section = {
 Write styles in JavaScript
 
 ```js
-var CSS = One.CSS;
+var CSS = One.CSS,
+  styleSheet = new CSS.StyleSheet('main');
 
-CSS.init({
+styleSheet.defineStyles({
   h1: {
     color: 'red',
     padding: '5px',
@@ -127,10 +128,12 @@ li {
 var CSS = One.CSS,
   Style = CSS.Style;
 
-var style = new Style('p', {color: 'purple'});
+var style = new Style('p', {color: 'purple'}),
+  styleSheet = CSS.getStyleSheet('main');
 
-CSS.compile();
+styleSheet.addStyle(style);
 ```
+
 The current stylesheet will now include the defined style `p {color: purple;}`.
 
 * Edit previous styles
@@ -140,15 +143,31 @@ The current stylesheet will now include the defined style `p {color: purple;}`.
 // => `p {color: purple;}`
 
 style.update({color: 'green'});
-
-CSS.compile();
 ```
 
 Now the style is updated `p {color: green;}`.
 
+* Auto-compilation
+
+The above examples work by leveraging auto compilation. However, if this is undesirable, it can be toggled off in one of two ways:
+
+```js
+// set default auto-compilation for stylesheets
+// note: this must be set before any style-sheets are created
+// any style-sheet created before updating this property will not be affected
+One.CSS.autoCompile = false;
+
+// or, directly set auto-compilation for specific style-sheets
+// this can be done at any time, and will affect any future actions for the style-sheet
+var styleSheet = One.CSS.getStyleSheet('main');
+styleSheet.autoCompile = false;
+```
+
+
+
 ## TODO
 * Add section about avoiding duplicate element keys
-* Add option to auto-comile on style created/update
+* Add feature to toggle off CSS syntax spacing
 * Consider breaking HTML and CSS into `one/html` and `one/css` submodules.
 * Add attribute class and id declaration to elements
 ```js

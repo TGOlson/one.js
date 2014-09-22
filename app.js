@@ -23,7 +23,9 @@ HTML.init({
   }
 });
 
-CSS.init({
+var styleSheet = new CSS.StyleSheet('main');
+
+styleSheet.defineStyles({
   h1: {
     color: 'red',
     padding: '5px',
@@ -41,4 +43,11 @@ CSS.init({
   }
 });
 
+var style = styleSheet.getStyle('li');
+
+style.update({color: 'white', 'background-color': '#ccc'});
+
+var anotherStyle = new CSS.Style('p', {color: 'green'});
+
+styleSheet.addStyle(anotherStyle);
 });

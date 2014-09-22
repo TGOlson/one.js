@@ -13,9 +13,9 @@
 })(function() {
 "use strict";
 
+if(!$) throw new Error('jQuery is required to use one.js');
 
 function One() {}
-
 
 One.HTML = HTML;
 function HTML() {}
@@ -142,105 +142,155 @@ function append(parent, element) {
 One.CSS = CSS;
 function CSS() {}
 
-CSS.init = function(styleDeclaration) {
+CSS.autoCompile = true;
 
-  // create style objects
-  $.map(styleDeclaration, function(styles, selector) {
-    var style = new Style(selector, styles);
-  });
+CSS._defaultStyleSheetId = 'stylesheet';
+CSS._styleSheets = {};
 
-  // compile css from all current style objects
-  this.compile();
-};
-
-CSS._defaultId = 'stylesheet';
-
-// compile all current style objects to css format
-// optionally accepts an id for target style-sheet
-CSS.compile = function(id) {
-  id = id || this._defaultId;
-
-  var styleElement = $('#' + id),
-    styles = Style.compile();
-
-  if(!styleElement.length) {
-    styleElement = this._createStyleElement(id);
-  }
-
-  styleElement.text(styles);
-
-  $('head').append(styleElement);
-};
-
-
-CSS._createStyleElement = function(id) {
-  id = id || this._defaultId;
-
-  return $('<style>')
-    .attr({
-      type: 'text/css',
-      id: id
-    });
-};
-
-
-CSS.Style = Style;
-function Style(selector, styles) {
-  this.selector = selector;
-  this.styles = styles;
-
-  // is this necessary?
-  // to string should probably only be generated on demand to avoid stale strings
-  // or add an update method
-  // this.css = this.toString();
-
-  Style._styles[selector] = this;
+CSS.getStyleSheet = getStyleSheet;
+function getStyleSheet(id) {
+  return CSS._styleSheets[id];
 }
 
-Style._styles = {};
+CSS.StyleSheet = StyleSheet;
+function StyleSheet(id) {
+  id = id || CSS._defaultStyleSheetId;
 
-Style.compile = function() {
-  var styles = this._styles;
+  var styleSheets = CSS._styleSheets;
 
-  return $.map(styles, function(style, selector) {
-    return style.toString();
-  }).join('\n');
+  if(styleSheets[id]) throw new Error('StyleSheet ' + id + ' already initialized.');
+
+  styleSheets[id] = this;
+
+  this.id = id;
+  this.element = makeElement(id);
+  this.styles = {};
+  this.autoCompile = CSS.autoCompile;
+
+  $('head').append(this.element);
+
+  function makeElement(id) {
+    var attrs = {
+      type: 'text/css',
+      id: id
+    };
+
+    return $('<style>').attr(attrs);
+  }
+}
+
+StyleSheet.prototype.defineStyles = function(styleObject) {
+  var _this = this;
+
+  $.map(styleObject, function(styles, selector) {
+    var style = new Style(selector, styles);
+    _this.addStyle(style);
+  });
+
+  // add option to enable/disable auto-compilation
+  return this.compileIfAutoCompile();
 };
 
-Style.get = get;
-function get(selector) {
-  return Style._styles[selector];
+StyleSheet.prototype.getStyle = function(selector) {
+  return this.styles[selector];
+};
+
+// assumes style is a style object
+StyleSheet.prototype.addStyle = function(style) {
+  this.styles[style.selector] = style;
+  style.styleSheet = this;
+  return this.compileIfAutoCompile();
+};
+
+StyleSheet.prototype.updateStyle = function(selector, styles) {
+  var style = this.getStyle(selector);
+
+  if(!style) throw new Error('Style not defined');
+
+  style.update(styles);
+
+  return this.compileIfAutoCompile();
+};
+
+// currently assumes selector is a string
+// later this could also accepts style objects
+StyleSheet.prototype.removeStyle = function(selector) {
+  var style = this.getStyle(selector);
+
+  if(!style) throw new Error('Style not defined');
+
+  delete this.styles[selector];
+
+  return this.compileIfAutoCompile();
+};
+
+StyleSheet.prototype.compileIfAutoCompile = function() {
+  if(this.autoCompile) this.compile();
+  return this;
+};
+
+StyleSheet.prototype.compile = function(stripWhiteSpace) {
+  var css = this.toCSS(stripWhiteSpace);
+  this.element.text(css);
+};
+
+StyleSheet.prototype.toCSS = function(stripWhiteSpace) {
+  var delimiter = stripWhiteSpace ? '' : '\n';
+
+  var styles = $.map(this.styles, function(style) {
+    return style.toCSS(stripWhiteSpace);
+  }).join(delimiter);
+
+  return delimiter + styles + delimiter;
+};
+
+CSS.Style = Style;
+function Style(selector, style) {
+  this.selector = selector;
+  this.style = style;
 }
 
 // ** format string to standard css formatting with spaces and newlines
-Style.prototype.toString = function() {
-  var styleString = this.selector + JSON.stringify(this.styles);
+// add option to not add spaces and newlines
+Style.prototype.toCSS = function(stripWhiteSpace) {
+  var styleString = this.selector + JSON.stringify(this.style),
 
+    // set conditional delimiters
+    space = stripWhiteSpace ? '' : ' ',
+    newline = stripWhiteSpace ? '' : '\n',
+    newlineDoubleSpace = stripWhiteSpace ? '' : '\n  ';
 
-  // add space before opening bracket, followed by newline
-  return styleString.replace(/{/g, ' {\n  ')
+  // add space new line after opening bracket, followed by two spaces
+  return styleString.replace(/{/g, space + '{' + newlineDoubleSpace)
 
     // remove all double quotes created from stringifying
     .replace(/"/g, '')
 
     // convert commas to semicolons, adding extra space
-    .replace(/,/g, ';\n  ')
+    .replace(/,/g, ';' + newlineDoubleSpace)
 
     // add extra space after each colon
-    .replace(/:/g, ': ')
+    .replace(/:/g, ':' + space)
 
     // add closing semicolon and new line before closing brackets
-    // add new line after bracket
-    .replace(/}/g, ';\n}');
+    .replace(/}/g, ';' + newline + '}');
 };
 
 Style.prototype.update = function(styles) {
   var _this = this;
-  $.each(styles, function(val, style) {
-    _this.styles[val] = style;
+
+  $.each(styles, function(selector, style) {
+    _this.style[selector] = style;
   });
 
+  // check for auto compile if current style has a parent style-sheet
+  if(this.styleSheet) this.styleSheet.compileIfAutoCompile();
+
   return this;
+};
+
+Style.prototype.getValue = function(property) {
+  return this.style[property];
 };
 
 return One;
