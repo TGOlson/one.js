@@ -82,7 +82,7 @@ Write styles in JavaScript
 var CSS = One.CSS,
 
   // style declaration object
-  styles{
+  styles = {
     h1: {
       color: 'red',
       padding: '5px',
