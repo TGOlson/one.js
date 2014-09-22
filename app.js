@@ -23,9 +23,7 @@ HTML.init({
   }
 });
 
-var styleSheet = new CSS.StyleSheet('main');
-
-styleSheet.defineStyles({
+var styles = {
   h1: {
     color: 'red',
     padding: '5px',
@@ -41,7 +39,9 @@ styleSheet.defineStyles({
     'list-style': 'none',
     'background-color': 'green'
   }
-});
+};
+
+var styleSheet = new CSS.StyleSheet('main', styles);
 
 var style = styleSheet.getStyle('li');
 

@@ -19,6 +19,8 @@ Lots of inspiration taken from [React](http://facebook.github.io/react/), as wel
 
 ## HTML as JavaScript
 
+**note, HTML development is currently on hold**
+
 Write markup in JavaScript object format.
 
 ```js
@@ -78,25 +80,27 @@ Write styles in JavaScript
 
 ```js
 var CSS = One.CSS,
-  styleSheet = new CSS.StyleSheet('main');
 
-styleSheet.defineStyles({
-  h1: {
-    color: 'red',
-    padding: '5px',
-    border: '1px solid black'
+  // style definition object
+  styles{
+    h1: {
+      color: 'red',
+      padding: '5px',
+      border: '1px solid black'
+    },
+    '.header': {
+      'font-size': '20px'
+    },
+    '#custom-subtext': {
+      'text-decoration': 'underline'
+    },
+    li: {
+      'list-style': 'none',
+      'background-color': 'green'
+    }
   },
-  '.header': {
-    'font-size': '20px'
-  },
-  '#custom-subtext': {
-    'text-decoration': 'underline'
-  },
-  li: {
-    'list-style': 'none',
-    'background-color': 'green'
-  }
-});
+
+  styleSheet = new CSS.StyleSheet('main', styles);
 ```
 
 Gets compiled directly to CSS
@@ -129,6 +133,7 @@ var CSS = One.CSS,
   styleSheet = CSS.getStyleSheet('main');
 
 styleSheet.addStyle('p', {color: 'purple'});
+// => [object Style]
 ```
 
 The current style-sheet will now include the defined style `p {color: purple;}`.
@@ -138,27 +143,26 @@ The current style-sheet will now include the defined style `p {color: purple;}`.
 ```js
 // styleSheet variable from previous example
 styleSheet.update('p', {color: 'green'});
+// => [object Style]
 ```
 
-Now the style is updated `p {color: green;}`.
+Now the original style is updated `p {color: green;}`.
 
 * Interact with style objects
 
 ```js
-var CSS = One.CSS,
-  styleSheet = CSS.getStyleSheet('main'),
-  style = styleSheet.getStyle('p');
+// styleSheet variable from previous example
+var style = styleSheet.getStyle('p');
 
 style.toCSS();
-// =>
 // "p {
 //   color: green;
 // }"
 
 style.update({'background-color:' 'yellow'});
+// => [object Style]
 
 style.toCSS();
-// =>
 // "p {
 //   color: green;
 //   background-color: yellow;
@@ -183,8 +187,6 @@ One.CSS.autoCompile = false;
 var styleSheet = One.CSS.getStyleSheet('main');
 styleSheet.autoCompile = false;
 ```
-
-
 
 ## TODO
 * Add section about avoiding duplicate element keys

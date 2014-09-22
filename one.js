@@ -144,7 +144,6 @@ function CSS() {}
 
 CSS.autoCompile = true;
 
-CSS._defaultStyleSheetId = 'stylesheet';
 CSS._styleSheets = {};
 
 CSS.getStyleSheet = getStyleSheet;
@@ -153,19 +152,18 @@ function getStyleSheet(id) {
 }
 
 CSS.StyleSheet = StyleSheet;
-function StyleSheet(id) {
-  id = id || CSS._defaultStyleSheetId;
+function StyleSheet(id, styles) {
+  if(!id) throw new Error('Must initialize StyleSheet with id');
+  if(CSS._styleSheets[id]) throw new Error('StyleSheet ' + id + ' already initialized.');
 
-  var styleSheets = CSS._styleSheets;
-
-  if(styleSheets[id]) throw new Error('StyleSheet ' + id + ' already initialized.');
-
-  styleSheets[id] = this;
+  CSS._styleSheets[id] = this;
 
   this.id = id;
   this.element = makeElement(id);
   this.styles = {};
   this.autoCompile = CSS.autoCompile;
+
+  if(styles) this.addStyles(styles);
 
   $('head').append(this.element);
 
@@ -179,10 +177,10 @@ function StyleSheet(id) {
   }
 }
 
-StyleSheet.prototype.defineStyles = function(styleObject) {
+StyleSheet.prototype.addStyles = function(styles) {
   var _this = this;
 
-  $.map(styleObject, function(definitions, selector) {
+  $.map(styles, function(definitions, selector) {
     _this.addStyle(selector, definitions);
   });
 
