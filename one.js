@@ -180,8 +180,8 @@ function StyleSheet(id, styles) {
 StyleSheet.prototype.addStyles = function(styles) {
   var _this = this;
 
-  $.map(styles, function(definitions, selector) {
-    _this.addStyle(selector, definitions);
+  $.map(styles, function(declarations, selector) {
+    _this.addStyle(selector, declarations);
   });
 
   // add option to enable/disable auto-compilation
@@ -193,8 +193,8 @@ StyleSheet.prototype.getStyle = function(selector) {
 };
 
 // assumes style is a style object
-StyleSheet.prototype.addStyle = function(selector, definitions) {
-  var style = new Style(selector, definitions);
+StyleSheet.prototype.addStyle = function(selector, declarations) {
+  var style = new Style(selector, declarations);
 
   this.styles[style.selector] = style;
 
@@ -251,15 +251,15 @@ StyleSheet.prototype.toCSS = function(stripWhiteSpace) {
 };
 
 CSS.Style = Style;
-function Style(selector, definitions) {
+function Style(selector, declarations) {
   this.selector = selector;
-  this.definitions = definitions;
+  this.declarations = declarations;
 }
 
 // ** format string to standard css formatting with spaces and newlines
 // add option to not add spaces and newlines
 Style.prototype.toCSS = function(stripWhiteSpace) {
-  var styleString = this.selector + JSON.stringify(this.definitions),
+  var styleString = this.selector + JSON.stringify(this.declarations),
 
     // set conditional delimiters
     space = stripWhiteSpace ? '' : ' ',
@@ -282,11 +282,11 @@ Style.prototype.toCSS = function(stripWhiteSpace) {
     .replace(/}/g, ';' + newline + '}');
 };
 
-Style.prototype.update = function(definitions) {
+Style.prototype.update = function(declarations) {
   var _this = this;
 
-  $.each(definitions, function(property, value) {
-    _this.definitions[property] = value;
+  $.each(declarations, function(property, value) {
+    _this.declarations[property] = value;
   });
 
   // check for auto compile if current style has a parent style-sheet
@@ -296,7 +296,7 @@ Style.prototype.update = function(definitions) {
 };
 
 Style.prototype.getValue = function(property) {
-  return this.definitions[property];
+  return this.declarations[property];
 };
 
 Style.prototype.removeValue = function(property) {
@@ -304,7 +304,7 @@ Style.prototype.removeValue = function(property) {
 
   if(!value) throw new Error('Cannot remove value.');
 
-  delete this.definitions[property];
+  delete this.declarations[property];
 
   // check for auto compile if current style has a parent style-sheet
   if(this.styleSheet) this.styleSheet.compileIfAutoCompile();

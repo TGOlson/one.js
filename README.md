@@ -1,25 +1,10 @@
 # one.js
 
-Write HTML in JavaScript. Write CSS in JavaScript. Write JavaScript in JavaScript.
+Spike on single-language client-side applications. Write all markup and styles in JavaScript.
 
-Framework for single language client side applications.
-
-## About
-
-`one.js` allows developers to write entire client side applications using only one language - JavaScript. This helps reduce cognitive overhead, and produces a much more programmatic way of writing style and markup.
-
-Do wild things like passing style objects around, modifying them dynamically. Or creating markup templates in a concise, explicit manner.
-
-Lots of inspiration taken from [React](http://facebook.github.io/react/), as well many of the excellent templating libraries and JavaScript frameworks.
-
-## Usage
-
-* Create an `index.html` file, importing `jQuery`, `one.js` and any other JavaScript files. Note: `jQuery` needs to be loaded before `one.js` can run.
-* Write an entire client side application in JavaScript.
+**Note: Development on the JavaScript style module and compiler in continuing at [csjs](http://github.com/tgolson/csjs). Check out that project for a usable JavaScript-to-styles library.**
 
 ## HTML as JavaScript
-
-*note, HTML development is currently on hold*
 
 Write markup in JavaScript object format.
 
@@ -64,7 +49,7 @@ Gets directly compiled to HTML
 </body>
 ```
 
-Note: to avoid duplicate keys, use array syntax, templates, or use the name modifier `(...)`. Anything inside of the parenthesis will be removed, and provides a strategy for avoiding duplicate keys
+Note: to avoid duplicate keys, use array syntax or the name modifier `(<arbitrary-unique-content>)`. Anything inside of the parenthesis will be removed, and provides a strategy for avoiding duplicate keys.
 
 ```js
 var section = {
@@ -76,13 +61,11 @@ var section = {
 
 ## CSS as JavaScript
 
-Write styles in JavaScript
+Write styles in JavaScript object format.
 
 ```js
 var CSS = One.CSS,
-
-  // style declaration object
-  styles = {
+  styleSheet = new CSS.StyleSheet('main', {
     h1: {
       color: 'red',
       padding: '5px',
@@ -98,133 +81,5 @@ var CSS = One.CSS,
       'list-style': 'none',
       'background-color': 'green'
     }
-  },
-
-  // must create style-sheet with id
-  styleSheet = new CSS.StyleSheet('main', styles);
-```
-
-Gets compiled directly to CSS
-
-```css
-h1 {
-  color: red;
-  padding: 5px;
-  border: 1px solid black;
-}
-
-.header {
-  font-size: 20px;
-}
-
-#custom-subtext {
-  text-decoration: underline;
-}
-
-li {
-  list-style: none;
-  background-color: green;
-}
-```
-
-* Programmatically add styles
-
-```js
-var CSS = One.CSS,
-  styleSheet = CSS.getStyleSheet('main');
-
-styleSheet.addStyle('p', {color: 'purple'});
-// => [object Style]
-```
-
-The current style-sheet will now include the defined style `p {color: purple;}`.
-
-* Edit previous styles
-
-```js
-// styleSheet variable from previous example
-styleSheet.update('p', {color: 'green'});
-// => [object Style]
-```
-
-Now the original style is updated `p {color: green;}`.
-
-* Interact with style objects
-
-```js
-// styleSheet variable from previous example
-var style = styleSheet.getStyle('p');
-
-style.toCSS();
-// "p {
-//   color: green;
-// }"
-
-style.update({'background-color:' 'yellow'});
-// => [object Style]
-
-style.toCSS();
-// "p {
-//   color: green;
-//   background-color: yellow;
-// }"
-
-style.getValue('color');
-// => 'green'
-```
-
-* Auto-compilation
-
-The above examples work by leveraging auto compilation. However, if this is undesirable, it can be toggled off in one of two ways:
-
-```js
-// set default auto-compilation for style-sheets
-// note: this must be set before any style-sheets are created
-// any style-sheet created before updating this property will not be affected
-One.CSS.autoCompile = false;
-
-// or, directly set auto-compilation for specific style-sheets
-// this can be done at any time, and will affect any future actions for the style-sheet
-var styleSheet = One.CSS.getStyleSheet('main');
-styleSheet.autoCompile = false;
-```
-
-## TODO
-* Add section about avoiding duplicate element keys
-* Add feature to toggle off CSS syntax spacing
-* Consider breaking HTML and CSS into `one/html` and `one/css` submodules.
-* Add attribute class and id declaration to elements
-```js
-{
-  h1: {
-    class: 'class-name',
-    id: 'some-id',
-    content: 'Way cool text'
-  }
-};
-```
-* Allow defining attributes on elements (data, style, src, etc.)
-```js
-{
-  img: {
-    src: 'http://someimg.com/img.jpg',
-    style: {
-      border: '1px solid blue',
-      margin: '5px'
-    }
-  }
-};
-```
-* Create template syntax for defining elements
-```js
-
-var header = {
-  h1: 'Cool site',
-  ul: {...}
-};
-
-One.initDOM({
-  template: header,
-  div: {...}
-});
+  });
 ```
